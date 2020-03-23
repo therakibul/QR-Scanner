@@ -18,7 +18,13 @@
         $current_post_id = get_the_ID();
         $permalink = get_the_permalink($current_post_id);
         $title = get_the_title($current_post_id);
-        $image_src = sprintf("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=%s", $permalink);
+        $current_post_type = get_post_type($current_post_id);
+        $image_size = apply_filters("qrc_image_size", "180x180");
+        $exclude_post_type = apply_filters("qrc_remove_scanner_image", array());
+        if(in_array($current_post_type, $exclude_post_type)){
+            return $content;
+        }
+        $image_src = sprintf("https://api.qrserver.com/v1/create-qr-code/?size=%s&data=%s",$image_size, $permalink);
         $content .= sprintf("<img src='%s' alt='%s'>", $image_src, $title);
         return $content;
     }
