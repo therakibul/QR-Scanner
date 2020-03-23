@@ -29,4 +29,24 @@
         return $content;
     }
     add_filter("the_content", "qrc_post_scanner");
+
+    function qrc_settings_field(){
+        add_settings_section("qrc_section", "Scanner Input Section", "scanner_section", "general" );
+        add_settings_field( "qrc_height", "Height", "display_input_field", "general", "qrc_section", array("qrc_height") );
+        add_settings_field( "qrc_width", "Width", "display_input_field", "general", "qrc_section", array("qrc_width") );
+
+
+        register_setting("general", "qrc_height");
+        register_setting("general", "qrc_width");
+
+    }
+    function scanner_section(){
+        printf("<p>Enter your input.<p>");
+    }
+
+    function display_input_field($args){
+        $option = get_option($args[0]);
+        printf("<input type='text' name='{$args[0]}' value='%s'>", $option);
+    }
+    add_action("admin_init", "qrc_settings_field");
 ?>
