@@ -13,7 +13,17 @@
  * Text Domain:       qrc
  * Domain Path:       /languages
 */
+    $countries = [
+        "None", "AFG", "BD", "IND", "PAK", "AUS", "NZ", "SU", "ZIM", "WI" 
+    ];
 
+    function qrc_init(){
+        global $countries;
+       
+        $countries = apply_filters( "qrc_mofify_country", $countries );
+
+    }
+    add_action("init", "qrc_init");
     function qrc_post_scanner($content){
         $current_post_id = get_the_ID();
         $permalink = get_the_permalink($current_post_id);
@@ -34,11 +44,44 @@
         add_settings_section("qrc_section", "Scanner Input Section", "scanner_section", "general" );
         add_settings_field( "qrc_height", "Height", "display_input_field", "general", "qrc_section", array("qrc_height") );
         add_settings_field( "qrc_width", "Width", "display_input_field", "general", "qrc_section", array("qrc_width") );
-
-
+        add_settings_field( "qrc_select", "Select Country", "display_select_country", "general", "qrc_section" );
+        add_settings_field( "qrc_checkbox", "Select Country", "display_country_checkbox", "general", "qrc_section" );
+        
         register_setting("general", "qrc_height");
         register_setting("general", "qrc_width");
+        register_setting("general", "qrc_select");
+        register_setting("general", "qrc_checkbox");
+        
+    }
 
+    
+    function display_country_checkbox(){
+        $option = get_option("qrc_checkbox");
+        global $countries;
+        foreach($countries as $country){
+            $selected = "";
+            if(is_array($option) && in_array($country, $option)){
+                $selected  = "checked";
+            }
+            printf("<input type='checkbox' name='qrc_checkbox[]' value='%s' %s>%s<br>", $country, $selected, $country);
+        }
+    }
+    function display_select_country(){
+        $option = get_option("qrc_select");
+        global $countries;
+        ?>
+        <select name="qrc_select">
+            <?php 
+                foreach($countries as $country){
+                    $selected = "";
+                    if($option == $country){
+                        $selected = "selected";
+                    }
+                    printf("<option value='%s' %s>%s</option>", $country, $selected, $country);
+                }
+            ?>
+        </select>
+        <?php
     }
     function scanner_section(){
         printf("<p>Enter your input.<p>");
